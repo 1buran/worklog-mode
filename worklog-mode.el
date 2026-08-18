@@ -50,10 +50,33 @@
 
 ;;; Options
 
+(defvar worklog-directory)
+
+(defun worklog--refresh-auto-mode-alist ()
+  "Rebuild the directory-based `auto-mode-alist' entry from `worklog-directory'."
+  (let ((result '()))
+    (dolist (entry auto-mode-alist)
+      (unless (and (consp entry)
+                   (eq (cdr entry) 'worklog-mode)
+                   (string-match-p "/" (car entry)))
+        (push entry result)))
+    (setq auto-mode-alist (nreverse result)))
+  (add-to-list 'auto-mode-alist
+               (cons (concat (regexp-quote (file-name-as-directory
+                                            (expand-file-name worklog-directory)))
+                             "[^/]*\\.txt\\'")
+                     'worklog-mode)))
+
+(defun worklog--set-directory (sym val)
+  "Set `worklog-directory' (SYM) to VAL and refresh `auto-mode-alist'."
+  (set-default sym val)
+  (worklog--refresh-auto-mode-alist))
+
 (defcustom worklog-directory "~/worklogs"
   "Directory where worklog files are stored, one per project."
   :type 'directory
-  :group 'worklog)
+  :group 'worklog
+  :set #'worklog--set-directory)
 
 (defcustom worklog-fill-column 90
   "Column used for automatic word wrapping in `worklog-mode'."
@@ -385,8 +408,8 @@ by a colon.  The language is inferred from the file's extension."
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("worklog\\.txt\\'" . worklog-mode))
 
-;;;###autoload
-(add-to-list 'auto-mode-alist '("/worklogs/[^/]*\\.txt\\'" . worklog-mode))
+;; Directory-based entry is built from `worklog-directory' at load time.
+(worklog--refresh-auto-mode-alist)
 
 
 ;;; Project worklog
