@@ -48,5 +48,6 @@ emacs -Q --batch -l worklog-mode.el --eval \
 ## Commit & Pull Request Guidelines
 
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification): `type: description`, lowercase and imperative.
-- Keep the commit subject within 50 characters; wrap the body at 72 characters.
+- Keep the commit subject within 50 characters.
+- Wrap the commit body at 72 characters: hard-wrap every line at a word boundary, so no body line is longer than 72 characters.
 - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `style`, `perf`.
