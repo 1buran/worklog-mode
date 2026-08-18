@@ -43,6 +43,9 @@ With `use-package` and `straight.el`:
   (worklog-directory "~/worklogs"))
 ```
 
+Files under `worklog-directory` (as well as files named `worklog.txt`) open in
+`worklog-mode` automatically.
+
 ## Configuration
 
 | Option                        | Default     | Description                                  |

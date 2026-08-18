@@ -385,6 +385,9 @@ by a colon.  The language is inferred from the file's extension."
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("worklog\\.txt\\'" . worklog-mode))
 
+;;;###autoload
+(add-to-list 'auto-mode-alist '("/worklogs/[^/]*\\.txt\\'" . worklog-mode))
+
 
 ;;; Project worklog
 
