@@ -262,7 +262,7 @@ very beginning of a non-list line."
    "\\|\\([A-Za-z_][A-Za-z0-9_]*\\)[[:blank:]]*(") ; 8 function call
   "Regexp matching a single code token in a worklog code block.")
 
-(defconst worklog-lang-modes
+(defcustom worklog-lang-modes
   '(("el" . emacs-lisp-mode)
     ("elisp" . emacs-lisp-mode)
     ("lisp" . lisp-mode)
@@ -316,7 +316,13 @@ very beginning of a non-list line."
     ("tf" . terraform-mode)
     ("tfvars" . terraform-mode)
     ("vue" . vue-mode))
-  "Alist mapping language/extension names to major modes for code blocks.")
+  "Alist mapping language/extension names to major modes for code blocks.
+
+Each element is (NAME . MODE), where NAME is the extension or language
+label written after the filename colon.  You may add or override entries;
+new entries take precedence over the built-in ones."
+  :type '(alist :key-type string :value-type function)
+  :group 'worklog)
 
 (defun worklog-lang-mode (lang)
   "Return the major-mode symbol for LANG (a file extension or language name).

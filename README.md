@@ -64,6 +64,14 @@ Highlighting colors are exposed as faces and customizable with
 `worklog-subheading-face`, `worklog-list-header-face`,
 `worklog-checkmark-face`.
 
+The extension-to-mode mapping for code blocks is `worklog-lang-modes`
+(`M-x customize-variable`). Add or override entries, e.g. to highlight
+`.js` blocks with `web-mode`:
+
+```elisp
+(add-to-list 'worklog-lang-modes '("js" . web-mode))
+```
+
 ## Usage
 
 Write plain text. A few conventions make it shine:
