@@ -114,7 +114,7 @@
   :group 'worklog)
 
 (defface worklog-paragraph-title-face
-  '((t :weight bold))
+  '((t :weight bold :foreground "plum"))
   "Face for the text of @pt paragraph-title lines in `worklog-mode'."
   :group 'worklog)
 
