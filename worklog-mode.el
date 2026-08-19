@@ -103,6 +103,13 @@
   :type 'string
   :group 'worklog)
 
+(defcustom worklog-subtitle-max-width 85
+  "Maximum width, in characters, of a line considered a subtitle.
+A plain non-empty line at most this wide, followed by a blank line and
+then more text, is highlighted with `worklog-subtitle-face'."
+  :type 'integer
+  :group 'worklog)
+
 
 ;;; Faces
 
@@ -132,6 +139,11 @@
   "Face for list-header lines (ending with `:') in `worklog-mode'."
   :group 'worklog)
 
+(defface worklog-subtitle-face
+  '((t :weight bold))
+  "Face for subtitle lines in `worklog-mode'."
+  :group 'worklog)
+
 (defface worklog-checkmark-face
   '((t :weight bold :foreground "green1"))
   "Face for the checkmark inserted by `worklog-toggle-checkmark'."
@@ -155,6 +167,31 @@ line starts with `-', a digit, or `.'."
                    (looking-at "[-0-9.]"))))
           (setq found t)
         (goto-char (match-end 0))))
+    found))
+
+(defun worklog-subtitle-matcher (limit)
+  "Font-lock matcher for a subtitle line before LIMIT.
+A subtitle is a plain non-empty line of at most `worklog-subtitle-max-width'
+characters, followed by a blank line and then more text."
+  (let ((re (format "^.\\{1,%d\\}$" worklog-subtitle-max-width))
+        found)
+    (while (and (not found)
+                (re-search-forward re limit t))
+      (let ((start (match-beginning 0))
+            (end (match-end 0)))
+        (when (and (save-excursion
+                     (goto-char start)
+                     (not (looking-at-p
+                           "\\(?:@\\|[[:blank:]]\\|[-+*][[:blank:]]\\|[0-9]+[.)][[:blank:]]\\|https?://\\)")))
+                   (save-excursion
+                     (goto-char end)
+                     (forward-line 1)
+                     (and (not (eobp)) (looking-at-p "[[:blank:]]*$")))
+                   (save-excursion
+                     (goto-char end)
+                     (forward-line 2)
+                     (and (not (eobp)) (looking-at-p "[^[:blank:]\n]"))))
+          (setq found t))))
     found))
 
 (defvar jit-lock-start)
@@ -443,6 +480,7 @@ by a colon.  The language is inferred from the file's extension."
     ("^\\(@next\\b\\)[[:blank:]]*\\(.*\\)$"  (1 'worklog-tag-face t) (2 'worklog-next-face t)) ; next-step line
     (worklog-fontify-file-code) ; indented blocks after "file.ext:" (native language fontification)
     (worklog-list-header-matcher (1 'worklog-list-header-face t)) ; list header
+    (worklog-subtitle-matcher (0 'worklog-subtitle-face t)) ; subtitle
     (,worklog-checkmark 0 'worklog-checkmark-face t)) ; checkmark
   "Font-lock rules for `worklog-mode'.")
 
