@@ -10,6 +10,7 @@ native syntax highlighting for embedded code blocks.
 - Before presenting changes, byte-compile the package from the repo root and make sure it is warning-free, then remove the generated `worklog-mode.elc` (it is ignored by `.gitignore`).
 - Verify the package loads cleanly with no user configuration.
 - Run the smoke test to confirm highlighting, list handling and code-block fontification still work.
+- Record every change — new features, functional changes, bug fixes and docs — in the project worklog (`~/worklogs/worklog-mode.txt`), one `@date` entry per session.
 
 ## Project Structure
 
