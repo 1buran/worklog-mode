@@ -109,9 +109,18 @@
 ;;; Faces
 
 (defface worklog-next-face
-  '((t :weight bold :foreground "seagreen1"))
+  '((t :weight bold))
   "Face for the text of @next lines in `worklog-mode'."
   :group 'worklog)
+
+(defcustom worklog-next-color "seagreen1"
+  "Foreground color for @next text.
+Applied to `worklog-next-face'."
+  :type 'color
+  :group 'worklog
+  :set (lambda (sym val)
+         (set-default sym val)
+         (set-face-foreground 'worklog-next-face val)))
 
 (defface worklog-paragraph-title-face
   '((t :weight bold))
@@ -133,15 +142,33 @@ Applied to `worklog-paragraph-title-face'."
   :group 'worklog)
 
 (defface worklog-english-face
-  '((t :foreground "skyblue1"))
+  '((t))
   "Face for English words and code identifiers in `worklog-mode'."
   :group 'worklog)
 
+(defcustom worklog-english-color "skyblue1"
+  "Foreground color for English words and code identifiers.
+Applied to `worklog-english-face'."
+  :type 'color
+  :group 'worklog
+  :set (lambda (sym val)
+         (set-default sym val)
+         (set-face-foreground 'worklog-english-face val)))
+
 (defface worklog-subheading-face
-  '((((type tty)) :weight bold :inverse-video t :foreground "mediumpurple1")
-    (t :weight bold :height 1.3 :foreground "mediumpurple1"))
+  '((((type tty)) :weight bold :inverse-video t)
+    (t :weight bold :height 1.3))
   "Face for the text of @title subheadings in `worklog-mode'."
   :group 'worklog)
+
+(defcustom worklog-title-color "mediumpurple1"
+  "Foreground color for @title subheadings.
+Applied to `worklog-subheading-face'."
+  :type 'color
+  :group 'worklog
+  :set (lambda (sym val)
+         (set-default sym val)
+         (set-face-foreground 'worklog-subheading-face val)))
 
 (defface worklog-list-header-face
   '((t :weight bold))

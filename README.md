@@ -57,14 +57,19 @@ Files under `worklog-directory` (as well as files named `worklog.txt`) open in
 | `worklog-insert-menu-key`     | `"C-c C-c"` | Key for the insert-tag menu                  |
 | `worklog-return-key`          | `"RET"`     | Key for starting the next list item          |
 | `worklog-toggle-checkmark-key`| `"C-c d"`   | Key for toggling a checkmark                 |
-| `worklog-pt-color`            | `"plum"`    | Foreground color of `@pt` paragraph titles   |
 
-Highlighting colors are exposed as faces and customizable with
-`M-x customize-face`:
+## Palette
 
-`worklog-next-face`, `worklog-tag-face`, `worklog-english-face`,
-`worklog-subheading-face`, `worklog-paragraph-title-face`, `worklog-list-header-face`,
-`worklog-checkmark-face`.
+Highlighting colors are configurable as options (each updates its face live
+via `M-x customize-variable`); the faces themselves remain customizable with
+`M-x customize-face`.
+
+| Option                   | Default           | Applies to                       |
+| ------------------------ | ----------------- | -------------------------------- |
+| `worklog-pt-color`       | `"plum"`          | `@pt` paragraph titles           |
+| `worklog-title-color`    | `"mediumpurple1"` | `@title` subheadings             |
+| `worklog-next-color`     | `"seagreen1"`     | `@next` lines                    |
+| `worklog-english-color`  | `"skyblue1"`      | English words / code identifiers |
 
 The extension-to-mode mapping for code blocks is `worklog-lang-modes`
 (`M-x customize-variable`). Add or override entries, e.g. to highlight
