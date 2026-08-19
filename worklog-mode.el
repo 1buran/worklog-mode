@@ -33,6 +33,8 @@
 ;;         $mongo->executeBulkWrite($bulk);
 ;;
 ;;     @next add a regression test
+;;
+;;     @pt A title for the paragraph below
 
 ;; Code blocks are indented by four spaces and are highlighted using the
 ;; major mode inferred from the extension of a filename mentioned just
@@ -111,9 +113,14 @@
   "Face for the text of @next lines in `worklog-mode'."
   :group 'worklog)
 
+(defface worklog-paragraph-title-face
+  '((t :weight bold))
+  "Face for the text of @pt paragraph-title lines in `worklog-mode'."
+  :group 'worklog)
+
 (defface worklog-tag-face
   '((t :foreground "slategray"))
-  "Face for the @date/@title/@next tags in `worklog-mode'."
+  "Face for the @date/@title/@next/@pt tags in `worklog-mode'."
   :group 'worklog)
 
 (defface worklog-english-face
@@ -410,12 +417,18 @@ by a colon.  The language is inferred from the file's extension."
   (interactive)
   (worklog-insert-tag "@next "))
 
+(defun worklog-insert-paragraph-title ()
+  "Insert an @pt paragraph-title tag."
+  (interactive)
+  (worklog-insert-tag "@pt "))
+
 (transient-define-prefix worklog-insert-menu ()
   "Insert a worklog tag or toggle a checkmark."
   ["Insert tag"
    ("d" "date"  worklog-insert-date)
    ("t" "title" worklog-insert-title)
-   ("n" "next"  worklog-insert-next)]
+   ("n" "next"  worklog-insert-next)
+   ("p" "pt"    worklog-insert-paragraph-title)]
   ["Mark"
    ("c" "checkmark" worklog-toggle-checkmark)])
 
@@ -441,6 +454,7 @@ by a colon.  The language is inferred from the file's extension."
       (8 'font-lock-function-name-face t t)))
     ("https?://[^[:space:]]+"   0 'link                      t)
     ("^\\(@next\\b\\)[[:blank:]]*\\(.*\\)$"  (1 'worklog-tag-face t) (2 'worklog-next-face t)) ; next-step line
+    ("^\\(@pt\\b\\)[[:blank:]]*\\(.*\\)$"  (1 'worklog-tag-face t) (2 'worklog-paragraph-title-face t)) ; paragraph title
     (worklog-fontify-file-code) ; indented blocks after "file.ext:" (native language fontification)
     (worklog-list-header-matcher (1 'worklog-list-header-face t)) ; list header
     (,worklog-checkmark 0 'worklog-checkmark-face t)) ; checkmark

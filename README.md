@@ -19,7 +19,8 @@ tags, lists and indented code blocks.
 
 ## Features
 
-- **Tags** — `@date`, `@title` and `@next` headings, each with its own face.
+- **Tags** — `@date`, `@title`, `@next` and `@pt` (paragraph title) headings,
+  each with its own face.
 - **Lists** — numbered and bulleted lists with blank-line separation and
   auto-numbering: press `RET` at the end of an item to start the next one.
 - **Checkmarks** — toggle `✅` on an item with `C-c d`.
@@ -61,7 +62,7 @@ Highlighting colors are exposed as faces and customizable with
 `M-x customize-face`:
 
 `worklog-next-face`, `worklog-tag-face`, `worklog-english-face`,
-`worklog-subheading-face`, `worklog-list-header-face`,
+`worklog-subheading-face`, `worklog-paragraph-title-face`, `worklog-list-header-face`,
 `worklog-checkmark-face`.
 
 The extension-to-mode mapping for code blocks is `worklog-lang-modes`
@@ -102,7 +103,7 @@ Key bindings inside a worklog buffer:
 | Key         | Command                    |
 | ----------- | -------------------------- |
 | `RET`       | `worklog-return` — next list item (auto-numbered) |
-| `C-c C-c`   | `worklog-insert-menu` — insert `@date`/`@title`/`@next` or a checkmark |
+| `C-c C-c`   | `worklog-insert-menu` — insert `@date`/`@title`/`@next`/`@pt` or a checkmark |
 | `C-c d`     | `worklog-toggle-checkmark` |
 | `C-c w`     | `worklog-open` — open the current project's journal (global) |
 
