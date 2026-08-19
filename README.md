@@ -57,6 +57,7 @@ Files under `worklog-directory` (as well as files named `worklog.txt`) open in
 | `worklog-insert-menu-key`     | `"C-c C-c"` | Key for the insert-tag menu                  |
 | `worklog-return-key`          | `"RET"`     | Key for starting the next list item          |
 | `worklog-toggle-checkmark-key`| `"C-c d"`   | Key for toggling a checkmark                 |
+| `worklog-pt-color`            | `"plum"`    | Foreground color of `@pt` paragraph titles   |
 
 Highlighting colors are exposed as faces and customizable with
 `M-x customize-face`:

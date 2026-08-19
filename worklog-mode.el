@@ -114,9 +114,18 @@
   :group 'worklog)
 
 (defface worklog-paragraph-title-face
-  '((t :weight bold :foreground "plum"))
+  '((t :weight bold))
   "Face for the text of @pt paragraph-title lines in `worklog-mode'."
   :group 'worklog)
+
+(defcustom worklog-pt-color "plum"
+  "Foreground color for @pt paragraph-title text.
+Applied to `worklog-paragraph-title-face'."
+  :type 'color
+  :group 'worklog
+  :set (lambda (sym val)
+         (set-default sym val)
+         (set-face-foreground 'worklog-paragraph-title-face val)))
 
 (defface worklog-tag-face
   '((t :foreground "slategray"))
