@@ -20,8 +20,6 @@ tags, lists and indented code blocks.
 ## Features
 
 - **Tags** — `@date`, `@title` and `@next` headings, each with its own face.
-- **Subtitles** — a short standalone line (≤ 85 chars) followed by a blank
-  line and a paragraph is bolded as a subtitle.
 - **Lists** — numbered and bulleted lists with blank-line separation and
   auto-numbering: press `RET` at the end of an item to start the next one.
 - **Checkmarks** — toggle `✅` on an item with `C-c d`.
@@ -54,7 +52,6 @@ Files under `worklog-directory` (as well as files named `worklog.txt`) open in
 | ----------------------------- | ----------- | -------------------------------------------- |
 | `worklog-directory`           | `"~/worklogs"` | Directory where journals are stored (one file per project) |
 | `worklog-fill-column`         | `90`        | Column used for automatic word wrapping      |
-| `worklog-subtitle-max-width`  | `85`        | Max line width considered a subtitle         |
 | `worklog-checkmark`           | `"✅"`       | Checkmark character                          |
 | `worklog-insert-menu-key`     | `"C-c C-c"` | Key for the insert-tag menu                  |
 | `worklog-return-key`          | `"RET"`     | Key for starting the next list item          |
