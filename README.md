@@ -10,7 +10,7 @@ code snippets — without pulling in `org-mode` or `markdown-mode`.
 The journal stays perfectly readable as raw text: no markup noise, just prose,
 tags, lists and indented code blocks.
 
-![Demo](https://i.imgur.com/tDS6bxe.gif)
+![Demo](https://i.imgur.com/xfh4jY2.gif)
 
 ## Why
 

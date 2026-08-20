@@ -61,7 +61,7 @@ Type "    cursor, err := coll.Find(ctx, filter)"
 Enter
 Type "    if err != nil {"
 Enter
-Type `    return fmt.Errorf("find: %w", err)`
+Type `        return fmt.Errorf("find: %w", err)`
 Enter
 Type "    }"
 Enter
@@ -83,9 +83,9 @@ Enter
 Type "and, again, the same in cron.php:"
 Enter
 Enter
-Type `    $bulk = new \MongoDB\Driver\BulkWrite();`
+Type "    $bulk = new \MongoDB\Driver\BulkWrite();"
 Enter
-Type `    $mongo->executeBulkWrite($bulk);`
+Type "    $mongo->executeBulkWrite($bulk);"
 Enter
 Enter
 
@@ -103,7 +103,30 @@ Type "Proposals:"
 Enter
 Type "1. Add tests for all parts of systems, think about integration tests"
 Enter
-Type "fix by check nil pointer before use it, also check the same bug in all projects, create appropriate tickets for all three departments and assign them to tech leads, ask Mick to review the code and coorditate all teammates"
+Type "fix by check nil pointer before use it, also check the same bug in all projects, create appropriate tickets for all three departments and assign them to tech leads, ask Mick to review the code and coordinate all teammates"
+Ctrl+J
+Ctrl+J
+
+# analysis steps (checkmarks via C-c d)
+Type "Analysis steps:"
+Enter
+Type "1. check error logs, found a lot of errors, need to adjust monitoring alerts (currently that errors silent for monitoring)"
+Enter
+Type "reproduce the panic locally, in docker environment"
+Enter
+Type "run code analysis tools"
+Ctrl+C
+Type "d"
+Sleep 400ms
+Up 2
+Ctrl+C
+Type "d"
+Sleep 400ms
+Up 3
+Ctrl+C
+Type "d"
+Sleep 400ms
+Down 6
 Ctrl+J
 Ctrl+J
 
