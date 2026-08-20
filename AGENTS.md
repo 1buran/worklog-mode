@@ -32,6 +32,8 @@ emacs -Q --batch -l worklog-mode.el
 # smoke test: fontify a tiny worklog covering tags, lists and a code block
 emacs -Q --batch -l worklog-mode.el --eval \
   '(with-temp-buffer (worklog-mode) (insert "@date 2026-01-01 12:00\n\n@title T\n\nwin.php:\n\n    $x = new Foo();\n\n- item\n") (font-lock-fontify-buffer))'
+# run the ERT test suite
+emacs -Q --batch -L . -l worklog-mode-tests.el -f ert-run-tests-batch-and-exit
 ```
 
 ## Coding Style & Naming Conventions
@@ -43,8 +45,8 @@ emacs -Q --batch -l worklog-mode.el --eval \
 
 ## Testing Guidelines
 
-- There is no ERT suite yet. Changes are verified with the byte-compile, load check and the batch smoke test above.
-- When adding behavior, extend the smoke test to cover the new construct (a new tag, list handling, code-block language inference, fill behavior, and so on).
+- The ERT suite in `worklog-mode-tests.el` covers tag/word/list/code-block fontification and the interactive commands (auto-numbering, checkmark toggle). Run it with the command above.
+- When adding behavior, extend the suite to cover the new construct (a new tag, list handling, code-block language inference, fill behavior, and so on).
 
 ## Commit & Pull Request Guidelines
 
