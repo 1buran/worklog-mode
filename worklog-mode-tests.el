@@ -111,5 +111,184 @@
     (worklog-toggle-checkmark)
     (should (string= (buffer-string) "1. item"))))
 
+;;; Fill helpers
+
+(ert-deftest worklog-test-code-line-p ()
+  (with-temp-buffer
+    (insert "    code\n")
+    (goto-char (point-min))
+    (should (worklog-code-line-p)))
+  (with-temp-buffer
+    (insert "not code\n")
+    (goto-char (point-min))
+    (should-not (worklog-code-line-p))))
+
+(ert-deftest worklog-test-adaptive-fill ()
+  (with-temp-buffer
+    (insert "- item")
+    (goto-char (point-min))
+    (should (string= (worklog-adaptive-fill-function) "  ")))
+  (with-temp-buffer
+    (insert "10. item")
+    (goto-char (point-min))
+    (should (string= (worklog-adaptive-fill-function) "    ")))
+  (with-temp-buffer
+    (insert "plain text")
+    (goto-char (point-min))
+    (should-not (worklog-adaptive-fill-function))))
+
+;;; List marker and return
+
+(ert-deftest worklog-test-next-item-marker ()
+  (with-temp-buffer
+    (insert "1. item")
+    (end-of-line)
+    (should (string= (worklog-next-item-marker) "2. ")))
+  (with-temp-buffer
+    (insert "- item")
+    (end-of-line)
+    (should (string= (worklog-next-item-marker) "- ")))
+  (with-temp-buffer
+    (insert "1. first item\n   continuation")
+    (end-of-line)
+    (should (string= (worklog-next-item-marker) "2. "))))
+
+(ert-deftest worklog-test-return-plain ()
+  (with-temp-buffer
+    (worklog-mode)
+    (insert "plain text")
+    (end-of-line)
+    (worklog-return)
+    (should (string= (buffer-string) "plain text\n"))))
+
+;;; Checkmark on bullets and plain lines
+
+(ert-deftest worklog-test-toggle-checkmark-bullet ()
+  (with-temp-buffer
+    (worklog-mode)
+    (insert "- item")
+    (beginning-of-line)
+    (worklog-toggle-checkmark)
+    (should (string= (buffer-string) "- ✅ item"))
+    (worklog-toggle-checkmark)
+    (should (string= (buffer-string) "- item"))))
+
+(ert-deftest worklog-test-toggle-checkmark-plain ()
+  (with-temp-buffer
+    (worklog-mode)
+    (insert "item")
+    (beginning-of-line)
+    (worklog-toggle-checkmark)
+    (should (string= (buffer-string) "✅ item"))
+    (worklog-toggle-checkmark)
+    (should (string= (buffer-string) "item"))))
+
+;;; Language inference
+
+(ert-deftest worklog-test-lang-mode-more ()
+  (should (eq (worklog-lang-mode "sh") 'sh-mode))
+  (should (eq (worklog-lang-mode "yml") 'yaml-mode))
+  (should (eq (worklog-lang-mode "php") 'php-mode))
+  (should (eq (worklog-lang-mode "zzz") 'zzz-mode))) ; fallback to LANG-mode
+
+;;; Generic code-token highlighting
+
+(ert-deftest worklog-test-code-token ()
+  (should (eq (worklog-test-face-of "    function foo($x)\n" "function")
+              'font-lock-keyword-face))
+  (should (eq (worklog-test-face-of "    function foo($x)\n" "foo")
+              'font-lock-function-name-face))
+  (should (eq (worklog-test-face-of "    $x = 42;\n" "$x")
+              'font-lock-variable-name-face))
+  (should (eq (worklog-test-face-of "    $x = 42;\n" "42")
+              'font-lock-constant-face))
+  (should (eq (worklog-test-face-of "    // comment\n" "// comment")
+              'font-lock-comment-face)))
+
+;;; Tag insertion
+
+(ert-deftest worklog-test-insert-tags ()
+  (with-temp-buffer (worklog-mode) (worklog-insert-title)
+    (should (string= (buffer-string) "@title ")))
+  (with-temp-buffer (worklog-mode) (worklog-insert-next)
+    (should (string= (buffer-string) "@next ")))
+  (with-temp-buffer (worklog-mode) (worklog-insert-paragraph-title)
+    (should (string= (buffer-string) "@pt "))))
+
+(ert-deftest worklog-test-insert-date ()
+  (with-temp-buffer
+    (worklog-mode)
+    (worklog-insert-date)
+    (should (string-match-p "^@date [0-9-]+ [0-9:]+$" (buffer-string)))))
+
+(ert-deftest worklog-test-insert-tag-mid-line ()
+  (with-temp-buffer
+    (worklog-mode)
+    (insert "some text")
+    (goto-char (+ (point-min) 4))
+    (worklog-insert-title)
+    (should (string= (buffer-string) "some text\n@title "))))
+
+;;; Color options
+
+(ert-deftest worklog-test-color-defaults ()
+  (should (string= (face-foreground 'worklog-paragraph-title-face) "plum"))
+  (should (string= (face-foreground 'worklog-subheading-face) "mediumpurple1"))
+  (should (string= (face-foreground 'worklog-next-face) "seagreen1"))
+  (should (string= (face-foreground 'worklog-english-face) "skyblue1")))
+
+(ert-deftest worklog-test-color-option ()
+  (let ((old (face-foreground 'worklog-paragraph-title-face)))
+    (unwind-protect
+        (progn
+          (customize-set-variable 'worklog-pt-color "tomato")
+          (should (string= (face-foreground 'worklog-paragraph-title-face)
+                           "tomato")))
+      (customize-set-variable 'worklog-pt-color old))))
+
+;;; Project detection and open
+
+(ert-deftest worklog-test-project-name ()
+  (let ((default-directory "/tmp/projects/my-project/"))
+    (should (string= (worklog-project-name) "my-project"))))
+
+(ert-deftest worklog-test-open ()
+  (let ((dir (make-temp-file "worklog-open-test" t)))
+    (unwind-protect
+        (let ((worklog-directory dir)
+              (default-directory "/tmp/projects/my-project/"))
+          (worklog-open)
+          (should (derived-mode-p 'worklog-mode))
+          (should (string= (buffer-file-name)
+                           (expand-file-name "my-project.txt" dir))))
+      (delete-directory dir t))))
+
+;;; auto-mode-alist
+
+(defun worklog-test-mode-for-path (path)
+  "Return the `auto-mode-alist' mode matching PATH, or nil."
+  (catch 'found
+    (dolist (entry auto-mode-alist)
+      (when (and (consp entry) (stringp (car entry))
+                 (string-match-p (car entry) path))
+        (throw 'found (cdr entry))))
+    nil))
+
+(ert-deftest worklog-test-auto-mode-alist-entry ()
+  (should (eq (worklog-test-mode-for-path
+               (expand-file-name "~/worklogs/foo.txt"))
+              'worklog-mode))
+  (should-not (eq (worklog-test-mode-for-path "/tmp/other/foo.txt")
+                  'worklog-mode)))
+
+(ert-deftest worklog-test-auto-mode-alist-rebuild ()
+  (let ((old worklog-directory))
+    (unwind-protect
+        (progn
+          (customize-set-variable 'worklog-directory "/tmp/wl-test")
+          (should (eq (worklog-test-mode-for-path "/tmp/wl-test/bar.txt")
+                      'worklog-mode)))
+      (customize-set-variable 'worklog-directory old))))
+
 (provide 'worklog-mode-tests)
 ;;; worklog-mode-tests.el ends here
