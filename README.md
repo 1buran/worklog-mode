@@ -10,6 +10,8 @@ code snippets — without pulling in `org-mode` or `markdown-mode`.
 The journal stays perfectly readable as raw text: no markup noise, just prose,
 tags, lists and indented code blocks.
 
+![Demo](https://i.imgur.com/tDS6bxe.gif)
+
 ## Why
 
 - `org-mode` is powerful but heavyweight; `markdown` syntax (`#`, ```` ``` ````)
@@ -113,9 +115,30 @@ Key bindings inside a worklog buffer:
 | `C-c d`     | `worklog-toggle-checkmark` |
 | `C-c w`     | `worklog-open` — open the current project's journal (global) |
 
-## Screenshot
+## Tasks
 
-Coming soon (generated with [vhs](https://github.com/charmbracelet/vhs)).
+These are tasks of [xc](https://github.com/joerdav/xc) runner.
+
+### demo
+
+Record the demo.
+```
+vhs worklog-mode.tape
+```
+
+### imgur
+
+Upload to Imgur and update readme.
+
+```
+. .env && url=`curl --location https://api.imgur.com/3/image \
+    --header "Authorization: Client-ID ${clientId}" \
+    --form image=@worklog-mode-demo.gif \
+    --form type=image \
+    --form title=worklog-mode \
+    --form description=Demo | jq -r '.data.link'`
+sed -i "s#^\!\[Demo\].*#![Demo]($url)#" README.md
+```
 
 ## License
 
