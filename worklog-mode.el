@@ -471,9 +471,20 @@ by a colon.  The language is inferred from the file's extension."
 
 ;;; Font-lock keywords
 
-(defvar worklog-font-lock-keywords
-  `(("[A-Za-z][A-Za-z0-9_]*\\(?:[./-][A-Za-z0-9_]+\\)*\\(?:([A-Za-z0-9_,.]*)\\)?" 0 'worklog-english-face t) ; code tokens / calls
-    ("^\\(@date\\b\\)[[:blank:]]*\\(.*\\)$"  (1 'worklog-tag-face t) (2 'outline-1 t)) ; @date entry
+(defconst worklog-english-regexp
+  "[A-Za-z][A-Za-z0-9_]*\\(?:[./-][A-Za-z0-9_]+\\)*\\(?:([A-Za-z0-9_,.]*)\\)?"
+  "Regexp matching English words and code identifiers in `worklog-mode'.")
+
+(defconst worklog-highlight-preset-numbers "[0-9]+"
+  "Preset regexp matching numbers.")
+(defconst worklog-highlight-preset-todos "TODO\\|FIXME\\|HACK"
+  "Preset regexp matching TODO/FIXME/HACK markers.")
+
+(defvar worklog-highlight-english t)
+(defvar worklog-highlight-rules nil)
+
+(defvar worklog-font-lock-keywords-base
+  `(("^\\(@date\\b\\)[[:blank:]]*\\(.*\\)$"  (1 'worklog-tag-face t) (2 'outline-1 t)) ; @date entry
     ("^\\(@title\\b\\)[[:blank:]]*\\(.*\\)$" (1 'worklog-tag-face t) (2 'worklog-subheading-face t)) ; @title heading
     ("^ *- "                    0 'font-lock-keyword-face    t)
     ("^ *[0-9]+\\."             0 'font-lock-keyword-face    t)
@@ -494,7 +505,52 @@ by a colon.  The language is inferred from the file's extension."
     (worklog-fontify-file-code) ; indented blocks after "file.ext:" (native language fontification)
     (worklog-list-header-matcher (1 'worklog-list-header-face t)) ; list header
     (,worklog-checkmark 0 'worklog-checkmark-face t)) ; checkmark
-  "Font-lock rules for `worklog-mode'.")
+  "Base font-lock rules for `worklog-mode', excluding configurable highlights.")
+
+(defvar worklog-font-lock-keywords nil
+  "Font-lock rules for `worklog-mode', rebuilt from the highlight options.")
+
+(defun worklog--face-for-color (color)
+  "Return a face whose foreground is COLOR, creating it if needed."
+  (let ((face (intern (format "worklog-highlight-%s-face"
+                              (replace-regexp-in-string "[^[:alnum:]]" "" (downcase color))))))
+    (unless (facep face)
+      (make-empty-face face)
+      (set-face-foreground face color))
+    face))
+
+(defun worklog--rebuild-keywords ()
+  "Rebuild `worklog-font-lock-keywords' from the highlight options."
+  (let ((dynamic '()))
+    (when worklog-highlight-english
+      (push `(,worklog-english-regexp 0 'worklog-english-face t) dynamic))
+    (dolist (rule worklog-highlight-rules)
+      (when (and (consp rule) (stringp (car rule)) (stringp (cdr rule)))
+        (push `(,(car rule) 0 ',(worklog--face-for-color (cdr rule)) t) dynamic)))
+    (setq worklog-font-lock-keywords
+          (append (nreverse dynamic) worklog-font-lock-keywords-base))))
+
+(defun worklog--set-highlight (sym val)
+  "Set SYM to VAL and rebuild the font-lock keywords."
+  (set-default sym val)
+  (worklog--rebuild-keywords))
+
+(defcustom worklog-highlight-english t
+  "When non-nil, highlight English words and code identifiers.
+The color is controlled by `worklog-english-color'."
+  :type 'boolean
+  :group 'worklog
+  :set #'worklog--set-highlight)
+
+(defcustom worklog-highlight-rules nil
+  "Alist of (REGEXP . COLOR) highlighting rules for `worklog-mode'.
+Each entry highlights text matching REGEXP with COLOR.
+Set to nil to disable extra highlighting."
+  :type '(repeat (cons regexp color))
+  :group 'worklog
+  :set #'worklog--set-highlight)
+
+(worklog--rebuild-keywords)
 
 
 ;;; Mode

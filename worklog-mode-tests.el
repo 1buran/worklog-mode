@@ -290,5 +290,45 @@
                       'worklog-mode)))
       (customize-set-variable 'worklog-directory old))))
 
+;;; Configurable highlighting
+
+(ert-deftest worklog-test-highlight-english-off ()
+  (let ((old worklog-highlight-english))
+    (unwind-protect
+        (progn
+          (customize-set-variable 'worklog-highlight-english nil)
+          (should-not (worklog-test-face-of "the variable\n" "variable")))
+      (customize-set-variable 'worklog-highlight-english old))))
+
+(ert-deftest worklog-test-highlight-rules ()
+  (let ((old worklog-highlight-rules))
+    (unwind-protect
+        (progn
+          (customize-set-variable 'worklog-highlight-rules '(("[0-9]+" . "red")))
+          (let ((face (worklog-test-face-of "see 42 and 123\n" "42")))
+            (should face)
+            (should (string= (face-foreground face) "red"))))
+      (customize-set-variable 'worklog-highlight-rules old))))
+
+(ert-deftest worklog-test-highlight-multiple-rules ()
+  (let ((old worklog-highlight-rules))
+    (unwind-protect
+        (progn
+          (customize-set-variable
+           'worklog-highlight-rules
+           `((,worklog-highlight-preset-numbers . "red")
+             ("TODO\\|FIXME" . "orange")))
+          (should (string= (face-foreground
+                            (worklog-test-face-of "see 42\n" "42"))
+                           "red"))
+          (should (string= (face-foreground
+                            (worklog-test-face-of "TODO fix\n" "TODO"))
+                           "orange")))
+      (customize-set-variable 'worklog-highlight-rules old))))
+
+(ert-deftest worklog-test-highlight-presets ()
+  (should (string-match-p worklog-highlight-preset-numbers "42"))
+  (should (string-match-p worklog-highlight-preset-todos "FIXME")))
+
 (provide 'worklog-mode-tests)
 ;;; worklog-mode-tests.el ends here

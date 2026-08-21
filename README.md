@@ -59,6 +59,8 @@ Files under `worklog-directory` (as well as files named `worklog.txt`) open in
 | `worklog-insert-menu-key`     | `"C-c C-c"` | Key for the insert-tag menu                  |
 | `worklog-return-key`          | `"RET"`     | Key for starting the next list item          |
 | `worklog-toggle-checkmark-key`| `"C-c d"`   | Key for toggling a checkmark                 |
+| `worklog-highlight-english`   | `t`         | Highlight English words / code identifiers   |
+| `worklog-highlight-rules`     | `nil`       | Extra `(REGEXP . COLOR)` highlight rules     |
 
 ## Palette
 
@@ -72,6 +74,23 @@ via `M-x customize-variable`); the faces themselves remain customizable with
 | `worklog-title-color`    | `"mediumpurple1"` | `@title` subheadings             |
 | `worklog-next-color`     | `"seagreen1"`     | `@next` lines                    |
 | `worklog-english-color`  | `"skyblue1"`      | English words / code identifiers |
+
+### Custom highlights
+
+English/code-identifier highlighting can be turned off (e.g. for an
+English-language journal) and extended with arbitrary rules:
+
+```elisp
+(use-package worklog-mode
+  :custom
+  (worklog-highlight-english nil)         ; disable the built-in rule
+  (worklog-highlight-rules
+   '(("[0-9]+" . "red")                   ; numbers in red
+     ("TODO\\|FIXME" . "orange"))))       ; TODO markers in orange
+```
+
+Ready-made regexps: `worklog-highlight-preset-numbers`,
+`worklog-highlight-preset-todos`.
 
 The extension-to-mode mapping for code blocks is `worklog-lang-modes`
 (`M-x customize-variable`). Add or override entries, e.g. to highlight
