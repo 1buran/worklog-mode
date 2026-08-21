@@ -441,7 +441,7 @@ by a colon.  The language is inferred from the file's extension."
 (defun worklog-insert-date ()
   "Insert an @date tag with the current timestamp."
   (interactive)
-  (worklog-insert-tag (format "@date %s" (format-time-string "%Y-%m-%d %H:%M"))))
+  (worklog-insert-tag (format "@date %s" (format-time-string "%Y-%m-%d %H:%M\n\n"))))
 
 (defun worklog-insert-title ()
   "Insert an @title tag."
