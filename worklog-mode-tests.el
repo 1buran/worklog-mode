@@ -355,5 +355,16 @@
       (customize-set-variable 'worklog-highlight-case-fold old-fold)
       (customize-set-variable 'worklog-highlight-rules old-rules))))
 
+(ert-deftest worklog-test-highlight-precedence ()
+  "A custom rule must win over the English-word fallback."
+  (let ((old worklog-highlight-rules))
+    (unwind-protect
+        (progn
+          (customize-set-variable 'worklog-highlight-rules '(("\\bWARNING\\b" . "orange")))
+          (should (string= (face-foreground
+                            (worklog-test-face-of "WARNING\n" "WARNING"))
+                           "orange")))
+      (customize-set-variable 'worklog-highlight-rules old))))
+
 (provide 'worklog-mode-tests)
 ;;; worklog-mode-tests.el ends here

@@ -530,7 +530,8 @@ by a colon.  The language is inferred from the file's extension."
   "Rebuild `worklog-font-lock-keywords' from the highlight options."
   (let ((dynamic '()))
     (when worklog-highlight-english
-      (push `(,worklog-english-regexp 0 'worklog-english-face t) dynamic))
+      ;; No override: English is a fallback so specific rules win over it.
+      (push `(,worklog-english-regexp 0 'worklog-english-face) dynamic))
     (dolist (rule worklog-highlight-rules)
       (when (and (consp rule) (stringp (car rule)))
         (push `(,(car rule) 0 ',(worklog--face-for-rule (cdr rule)) t) dynamic)))
