@@ -475,8 +475,10 @@ by a colon.  The language is inferred from the file's extension."
   "[A-Za-z][A-Za-z0-9_]*\\(?:[./-][A-Za-z0-9_]+\\)*\\(?:([A-Za-z0-9_,.]*)\\)?"
   "Regexp matching English words and code identifiers in `worklog-mode'.")
 
-(defvar worklog-highlight-english t)
-(defvar worklog-highlight-rules nil)
+;; Forward declarations only; no default value so `use-package :custom'
+;; (which sets these before the package is loaded) keeps its value.
+(defvar worklog-highlight-english)
+(defvar worklog-highlight-rules)
 
 (defvar worklog-font-lock-keywords-base
   `(("^\\(@date\\b\\)[[:blank:]]*\\(.*\\)$"  (1 'worklog-tag-face t) (2 'outline-1 t)) ; @date entry
@@ -529,10 +531,10 @@ by a colon.  The language is inferred from the file's extension."
 (defun worklog--rebuild-keywords ()
   "Rebuild `worklog-font-lock-keywords' from the highlight options."
   (let ((dynamic '()))
-    (when worklog-highlight-english
+    (when (and (boundp 'worklog-highlight-english) worklog-highlight-english)
       ;; No override: English is a fallback so specific rules win over it.
       (push `(,worklog-english-regexp 0 'worklog-english-face) dynamic))
-    (dolist (rule worklog-highlight-rules)
+    (dolist (rule (and (boundp 'worklog-highlight-rules) worklog-highlight-rules))
       (when (and (consp rule) (stringp (car rule)))
         (push `(,(car rule) 0 ',(worklog--face-for-rule (cdr rule)) t) dynamic)))
     (setq worklog-font-lock-keywords
