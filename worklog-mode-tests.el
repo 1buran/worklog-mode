@@ -316,7 +316,7 @@
         (progn
           (customize-set-variable
            'worklog-highlight-rules
-           `((,worklog-highlight-preset-numbers . "red")
+           '(("[0-9]+" . "red")
              ("TODO\\|FIXME" . "orange")))
           (should (string= (face-foreground
                             (worklog-test-face-of "see 42\n" "42"))
@@ -326,9 +326,34 @@
                            "orange")))
       (customize-set-variable 'worklog-highlight-rules old))))
 
-(ert-deftest worklog-test-highlight-presets ()
-  (should (string-match-p worklog-highlight-preset-numbers "42"))
-  (should (string-match-p worklog-highlight-preset-todos "FIXME")))
+(ert-deftest worklog-test-highlight-face-spec ()
+  (let ((old worklog-highlight-rules))
+    (unwind-protect
+        (progn
+          (customize-set-variable
+           'worklog-highlight-rules
+           '(("\\bWARNING\\b" . (:foreground "yellow" :weight bold))
+             ("\\bERROR\\b" . font-lock-warning-face)))
+          (let ((warn (worklog-test-face-of "WARNING disk\n" "WARNING")))
+            (should warn)
+            (should (string= (face-foreground warn) "yellow"))
+            (should (eq (face-attribute warn :weight) 'bold)))
+          (should (eq (worklog-test-face-of "ERROR x\n" "ERROR")
+                      'font-lock-warning-face)))
+      (customize-set-variable 'worklog-highlight-rules old))))
+
+(ert-deftest worklog-test-highlight-case-fold ()
+  (let ((old-rules worklog-highlight-rules)
+        (old-fold worklog-highlight-case-fold))
+    (unwind-protect
+        (progn
+          (customize-set-variable 'worklog-highlight-rules '(("TODO\\|FIXME" . "orange")))
+          (customize-set-variable 'worklog-highlight-case-fold t)
+          (let ((face (worklog-test-face-of "todo\n" "todo")))
+            (should face)
+            (should (string= (face-foreground face) "orange"))))
+      (customize-set-variable 'worklog-highlight-case-fold old-fold)
+      (customize-set-variable 'worklog-highlight-rules old-rules))))
 
 (provide 'worklog-mode-tests)
 ;;; worklog-mode-tests.el ends here

@@ -475,11 +475,6 @@ by a colon.  The language is inferred from the file's extension."
   "[A-Za-z][A-Za-z0-9_]*\\(?:[./-][A-Za-z0-9_]+\\)*\\(?:([A-Za-z0-9_,.]*)\\)?"
   "Regexp matching English words and code identifiers in `worklog-mode'.")
 
-(defconst worklog-highlight-preset-numbers "[0-9]+"
-  "Preset regexp matching numbers.")
-(defconst worklog-highlight-preset-todos "TODO\\|FIXME\\|HACK"
-  "Preset regexp matching TODO/FIXME/HACK markers.")
-
 (defvar worklog-highlight-english t)
 (defvar worklog-highlight-rules nil)
 
@@ -519,14 +514,26 @@ by a colon.  The language is inferred from the file's extension."
       (set-face-foreground face color))
     face))
 
+(defun worklog--face-for-rule (spec)
+  "Return a face for SPEC: a color string, a face symbol, or a plist."
+  (cond
+   ((symbolp spec) spec)
+   ((stringp spec) (worklog--face-for-color spec))
+   ((listp spec)
+    (let ((face (intern (format "worklog-highlight-%x-face" (abs (sxhash-equal spec))))))
+      (unless (facep face)
+        (make-empty-face face)
+        (apply #'set-face-attribute face nil spec))
+      face))))
+
 (defun worklog--rebuild-keywords ()
   "Rebuild `worklog-font-lock-keywords' from the highlight options."
   (let ((dynamic '()))
     (when worklog-highlight-english
       (push `(,worklog-english-regexp 0 'worklog-english-face t) dynamic))
     (dolist (rule worklog-highlight-rules)
-      (when (and (consp rule) (stringp (car rule)) (stringp (cdr rule)))
-        (push `(,(car rule) 0 ',(worklog--face-for-color (cdr rule)) t) dynamic)))
+      (when (and (consp rule) (stringp (car rule)))
+        (push `(,(car rule) 0 ',(worklog--face-for-rule (cdr rule)) t) dynamic)))
     (setq worklog-font-lock-keywords
           (append (nreverse dynamic) worklog-font-lock-keywords-base))))
 
@@ -543,12 +550,21 @@ The color is controlled by `worklog-english-color'."
   :set #'worklog--set-highlight)
 
 (defcustom worklog-highlight-rules nil
-  "Alist of (REGEXP . COLOR) highlighting rules for `worklog-mode'.
-Each entry highlights text matching REGEXP with COLOR.
+  "Alist of (REGEXP . FACE) highlighting rules for `worklog-mode'.
+Each entry highlights text matching REGEXP with FACE.
+FACE is a color string, a face symbol, or a face attribute plist
+such as `(:foreground \"yellow\" :weight bold)'.
 Set to nil to disable extra highlighting."
-  :type '(repeat (cons regexp color))
+  :type '(repeat (cons regexp (choice color face sexp)))
   :group 'worklog
   :set #'worklog--set-highlight)
+
+(defcustom worklog-highlight-case-fold nil
+  "When non-nil, font-lock matching in `worklog-mode' ignores case.
+This lets a highlight rule like \"TODO\" match \"todo\" without writing
+both cases of each letter."
+  :type 'boolean
+  :group 'worklog)
 
 (worklog--rebuild-keywords)
 
@@ -558,7 +574,8 @@ Set to nil to disable extra highlighting."
 ;;;###autoload
 (define-derived-mode worklog-mode text-mode "Worklog"
   "Major mode for plain-text work log files."
-  (setq-local font-lock-defaults '(worklog-font-lock-keywords))
+  (setq-local font-lock-defaults
+              (list 'worklog-font-lock-keywords nil worklog-highlight-case-fold))
   (add-hook 'jit-lock-after-change-extend-region-functions
             #'worklog-extend-after-change nil t)
   (define-key worklog-mode-map (kbd worklog-insert-menu-key) #'worklog-insert-menu)
